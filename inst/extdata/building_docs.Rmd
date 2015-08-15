@@ -1,0 +1,46 @@
+---
+title: "Building Docs"
+output: html_document
+---
+
+
+```{r}
+devtools::install("~/Dropbox/public/github_readthedocs")
+library(readthedocs)
+require(flowr)
+require(knitr)
+
+pkg = "~/Dropbox/public/github_flow"
+
+#undebug(staticdocs:::as.sd_package)
+pkg = staticdocs::as.sd_package(pkg = "~/Dropbox/public/github_flow/",
+	site_path = "~/Dropbox/public/github_flowrdocs/source/rd",
+	templates_path = "~/Dropbox/public/github_restr/inst/templates")
+pkg
+#debug(rtd:::to_rst)
+#debug(rtd:::to_rst.character)
+#build_site(pkg = "~/Dropbox/public/github_flow/", topics)
+topics = topics = c(
+	"setup", 
+	"to_flowmat",
+	"to_flowdef",
+	"to_flow",
+	"plot_flow",
+	"submit_flow",
+	"kill_flow", 
+	"rerun_flow",
+	"queue", 
+	"git",
+	"flow"
+	)
+
+tmp <- build_topics(pkg = pkg, topics = topics)
+#undebug(build_vignettes)
+require(tools)
+tmp <- build_vignettes(pkg = pkg)
+
+
+```
+
+```
+
