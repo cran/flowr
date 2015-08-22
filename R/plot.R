@@ -82,11 +82,18 @@ plot_flow.flowdef <- function(x,
 															detailed = TRUE,
 															type = c('1','2'),
 															pdf = FALSE,
-															pdffile = sprintf("%s.pdf", x@name),
+															pdffile,
 															...){
 
 	type = match.arg(type)
 
+	## if pdffile is provide and pdf is FALSE
+	if(!missing(pdffile))
+		pdf = TRUE
+	if(missing(pdffile) & pdf)
+		pdffile = sprintf("%s.pdf", x@name)
+	
+	
 	##--- plotting needs prev_jobs to be NA and not none
 	x$prev_jobs = ifelse(x$prev_jobs == "none", NA, x$prev_jobs)
 	p <- switch(type,
@@ -156,6 +163,29 @@ display_mat <- function(x){
 	table(x$level)
 }
 
+#' calc_boxdim
+#' @param x number of jobs
+#' @param detailed detailed
+#' @param pdf pdf
+calc_boxdim <- function(x, detailed, pdf){
+	if(x > 15)
+		message("Plotting may not be pretty with big flows",
+						"try with detailed = FALSE OR",
+						"")
+	
+	## eq from eureka
+	ht = 0.041751221004381 - 0.000583347999406836*x
+	
+	if(!detailed)
+		ht = ht - 0.01
+	
+	if(pdf)
+		ht = ht - 0.01
+	
+	wd = ht + 0.02
+	detail.offset = c(0, ht*0.5)
+	list(wd = wd, ht = ht, detail.offset = detail.offset)
+}
 
 #' @importFrom grDevices dev.off
 #' @importFrom graphics par
@@ -186,18 +216,18 @@ display_mat <- function(x){
 	elpos <- coordinates(disp_mat)
 
 	## -------- graphic params:
-	shadow.col <- "lightskyblue4";boxwd=0.08;boxht=0.04;box.lcol = "gray26"
-	if (detailed) boxht=0.06
-	shadow.sizes.scatter=seq(from=0.001, by=0.003, length.out=4);shadow.sizes.serial=c(0.004)
+	shadow.col <- "lightskyblue4";
+	tmp = calc_boxdim(nrow(x), detailed, pdf)
+	boxwd=tmp$wd;boxht=tmp$ht;
+	
+	box.lcol = "gray26"
+	shadow.sizes.scatter = seq(from=0.001, by=0.003, length.out = 4);
+	shadow.sizes.serial=c(0.001)
 	arr.col="gray26";arr.lwd=3;arr.len=0.6; arr.pos=0.55
 	curves=c(-0.2,0.2);arr.lwd.curve=2;
-	textsize=1.1;textcol="gray30"
-	detail.cex=0.8; detail.offset=c(0,0.04)
-	## ---- change params for pdf
-	if (pdf){
-		boxht=0.03;
-		if (detailed) boxht=0.05
-	}
+	textsize = 1.1;textcol = "gray30"
+	detail.cex = 0.8; detail.offset = tmp$detail.offset
+
 	#detailed.labs = sprintf("%s:%s %s", dat_uniq$nodes, dat_uniq$cpu, dat_uniq$sub_type)
 	detailed.labs.sub = sprintf("sub: %s", dat_uniq$sub_type)
 	detailed.labs.dep = sprintf("dep: %s", dat_uniq$dep_type)

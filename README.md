@@ -1,9 +1,12 @@
 <!--[![DOI](https://zenodo.org/badge/11075/sahilseth/flowr.svg)](http://dx.doi.org/10.5281/zenodo.16170)-->
 [![Build Status](https://travis-ci.org/sahilseth/flowr.png)](https://travis-ci.org/sahilseth/flowr)
-[![codecov.io](http://codecov.io/github/sahilseth/flowr/coverage.svg?branch=master)](http://codecov.io/github/sahilseth/flowr?branch=master)
+[![](http://www.r-pkg.org/badges/version/flowr)](http://cran.rstudio.com/web/packages/flowr/index.html)
+![](http://cranlogs.r-pkg.org/badges/grand-total/flowr)
+
+<!--[![codecov.io](http://codecov.io/github/sahilseth/flowr/coverage.svg?branch=master)](http://codecov.io/github/sahilseth/flowr?branch=master)-->
 
 
-flow
+flowr
 ======
 
 R pacakge to design (and deploy) complex workflows, in a effective and efficient manner on High Perfomance computing clusters.
@@ -11,25 +14,21 @@ R pacakge to design (and deploy) complex workflows, in a effective and efficient
 Please visit [docs.flowr.space](http://docs.flowr.space) for more information and here is a slide deck providing a quick overview: [sahilseth.github.io/slides/flowrintro](http://sahilseth.github.io/slides/flowrintro)
 
 Here is a shiny app, [flow_creator](https://sseth.shinyapps.io/flow_creator/) for you to start building your flow.
-[`guest; guestpass`]
 
-Here are some useful questions:
-https://github.com/sahilseth/flowr/issues?q=label%3Aquestion
+We (re)-use some of the [github issues](https://github.com/sahilseth/flowr/issues?q=label%3Aquestion) as frequently asked questions.
 
 
 ```
-## for the latest stable build, recommended:
-install.packages("drat")
-drat::addRepo("sahilseth")
+## From the official R repository (may be a few versions behind)
 install.packages("flowr")
 
-## From the official R repository (may be a few versions behind)
-install.packages('flowr')
+## flowr previews, stable and recent
+drat::addRepo("sahilseth")		
+install.packages("flowr")
 
 ## for a latest and greatest, dev version.
 install.packages('devtools')
 devtools::install_github("sahilseth/flowr")
-
 ```
 
 ## Example:

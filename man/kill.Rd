@@ -8,7 +8,7 @@
 \usage{
 kill(x, ...)
 
-\method{kill}{character}(x, ...)
+\method{kill}{character}(x, force = FALSE, ...)
 
 \method{kill}{flow}(x, kill_cmd, jobid_col = "job_sub_id", ...)
 }
@@ -16,6 +16,8 @@ kill(x, ...)
 \item{x}{either path to flow [character] or fobj object of class \link{flow}}
 
 \item{...}{not used}
+
+\item{force}{When killing multiple flows, force is neccesary. This makes sure multiple flows are killed by accident.}
 
 \item{kill_cmd}{The command used to kill. Default is 'bkill' (LSF). One can used qdel for 'torque', 'sge' etc.}
 

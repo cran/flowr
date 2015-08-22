@@ -14,7 +14,9 @@ knitr::opts_chunk$set(
 
 ## ---- message=FALSE------------------------------------------------------
 library(flowr)
-setup()
+
+## ---- message=FALSE, eval=FALSE------------------------------------------
+#  setup()
 
 ## ---- message=FALSE, echo=FALSE, fig.height=1.5, fig.width=5, eval=FALSE----
 #  library(DiagrammeR)
@@ -26,7 +28,6 @@ setup()
 #  ")
 
 ## ----echo=FALSE, message=FALSE-------------------------------------------
-extdata = file.path(system.file(package = "flowr"), "extdata")
 ex = file.path(system.file(package = "flowr"), "pipelines")
 flow_mat = as.flowmat(file.path(ex, "sleep_pipe.tsv"))
 flow_def = as.flowdef(file.path(ex, "sleep_pipe.def"))

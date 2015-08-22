@@ -6,6 +6,7 @@
 #' @param x either path to flow [character] or fobj object of class \link{flow}
 #' @param kill_cmd The command used to kill. Default is 'bkill' (LSF). One can used qdel for 'torque', 'sge' etc.
 #' @param jobid_col Advanced use. The column name in 'flow_details.txt' file used to fetch jobids to kill
+#' @param force When killing multiple flows, force is neccesary. This makes sure multiple flows are killed by accident.
 #' @param ... not used
 #'
 #'
@@ -23,8 +24,16 @@ kill <- function(x, ...) {
 
 #' @rdname kill
 #' @description works on flow_path. Reads flow object and calls kill.flow()
+#' @importFrom knitr kable
 #' @export
-kill.character <- function(x, ...){
+kill.character <- function(x, force = FALSE, ...){
+	x = get_wds(x)
+	if(length(x) > 1 & !force){
+		message("found multiple wds, ",
+						kable(x),
+						"If you want to kill all of them, kill again with force=TRUE")
+		invisible("multi wds")
+	}
 	for(i in 1:length(x)){
 		fobj = read_fobj(x[i])
 		kill.flow(fobj, ...)

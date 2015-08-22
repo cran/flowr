@@ -19,6 +19,11 @@ as.flowmat <- function(x, grp_col, jobname_col, cmd_col, ...){
 	if(is.flowmat(x))
 		return(check(x))
 
+	if(is.list(x)){
+		message("x seems to be a list, binding all by rows")
+		x = do.call(rbind, x)
+	}
+
 	if(is.data.frame(x)){
 		## prevent issues with factors
 		x[] <- lapply(x, as.character)
@@ -31,6 +36,7 @@ as.flowmat <- function(x, grp_col, jobname_col, cmd_col, ...){
 		x <- read_sheet(x, id_column = "jobname")
 	}
 
+	
 	if(missing(grp_col)){
 		grp_col = "samplename"
 		if(grp_col %in% colnames(x))
@@ -107,7 +113,7 @@ to_flowmat.list <- function(x, samplename, ...){
 		data.frame(jobname, cmd, stringsAsFactors = FALSE)
 	})
 	ret = do.call(rbind, ret)
-	ret = cbind(samplename = samplename, ret)
+	ret = data.frame(samplename = samplename, ret, row.names = NULL)		
 	attr(ret, "class") <- c("flowmat", "data.frame")
 	return(ret)
 
@@ -140,6 +146,12 @@ to_flowmat.flow <- function(x, ...){
 
 ## not used, use char instead
 to_flowmat.character <- function(x, ...){
+	message("Assuming x is a path to a file, using as.flowmat")
+	.Deprecated("as.flowmat")
+	as.flowmat(x)
+}
+
+.to_flowmat.character <- function(x, ...){
 	.Deprecated("to_flowmat.list", msg = "Supply a named list instead of a vector.")
 	ret <- lapply(1:length(x), function(i){
 		cmd = x[i]

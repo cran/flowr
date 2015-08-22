@@ -46,7 +46,7 @@ detect_dep_type <- function(x, cmds, prev_job){
 #' @param flow_run_path Path to a folder. Main operating folder for this flow. Default it `get_opts("flow_run_path")`.
 #' @param desc Advanced Use. final flow name, please don't change.
 #'
-#' @param ... Supplied to specific functions like \link{to_flow.data.frame}
+#' @param ... Supplied to specific functions like \code{to_flow.data.frame}
 #'
 #' @param submit Depreciated. Use submit_flow on flow object this function returns. TRUE/FALSE
 #' @param execute Depreciated. Use submit_flow on flow object this function returns. TRUE/FALSE, an paramter to submit_flow()
@@ -85,6 +85,7 @@ to_flow <- function(x, ...) {
 	warnings()
 }
 
+#' @description vector: a file with flowmat table
 #' @rdname to_flow
 #' @export
 to_flow.vector <- function(x, def,
@@ -93,14 +94,17 @@ to_flow.vector <- function(x, def,
 	cmd_col,
 	...){
 
-	x = as.flowmat(x, grp_col, jobname_col, cmd_col)
+	x = as.flowmat(x,
+								 grp_col = grp_col,
+								 jobname_col = jobname_col,
+								 cmd_col = cmd_col)
 	to_flow(x, def, ...)
 
 }
 
 #' @rdname to_flow
 #' @export
-to_flow.data.frame <- function(x, def,
+to_flow.flowmat <- function(x, def,
 	grp_col,
 	jobname_col,
 	cmd_col,
@@ -206,13 +210,22 @@ to_flow.data.frame <- function(x, def,
 }
 
 
-
+#' @description a named list of commands for a sample. Its best to supply a flowmat instead.
 #' @rdname to_flow
 #' @importFrom utils packageVersion
-#' @export
+#' @importFrom knitr kable
 to_flow.list <- function(x, def, flowname, flow_run_path, desc, qobj, ...){
 	## --- qobj, missing only works for arguments
+# 	if(is.flowmat(x[[1]])){
+# 		warning("to_flow supports a list of commands as a input not list of flowmats.")
+# 		x = do.call(rbind, x)
+# 		fobj = to_flow(x, def, flowname = flowname,
+# 						flow_run_path = flow_run_path, ...)
+# 		return(fobj)
+# 	}
+
 	## x is a list of flow_mat, split by jobname
+	## this list should have three elements
 
 	jobs <- lapply(1:nrow(def), function(i, qobj){
 		message(".", appendLF = FALSE)
@@ -274,7 +287,7 @@ to_flow.list <- function(x, def, flowname, flow_run_path, desc, qobj, ...){
 			"\nIncase of issues please re-submit specifying them explicitly.")
 		mydef = create_jobs_mat(fobj)
 		cols = c("jobname",  'prev_jobs',  'dep_type', 'sub_type')
-		print(knitr::kable(mydef[, cols], col.names=FALSE))
+		print(kable(mydef[, cols], col.names=FALSE))
 	}
 
 	invisible(fobj)

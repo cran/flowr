@@ -5,6 +5,7 @@
 #' Currently checks objects S3 flowdef, flowmat
 #'
 #' @param x a flowdef or flowmat object
+#' @param verbose be chatty
 #' @param ... suppled to \code{check.classname} function
 #'
 #' @export
@@ -27,8 +28,9 @@ check.flowmat <- function(x, ...){
 
 
 #' @rdname check
+#' @importFrom knitr kable
 #' @export
-check.flowdef <- function(x, ...){
+check.flowdef <- function(x, verbose = get_opts("verbose"), ...){
 
 	dep_types = c("none", "serial", "gather", "burst")
 	sub_types = c("serial", "scatter")
@@ -103,5 +105,52 @@ check.flowdef <- function(x, ...){
 	##      serial  --(burst)--> scatter
 	## not allowed:
 	##      any --(none)--> any
+	for(i in 1:nrow(x)){
+		if(verbose) message("checking on: ", i," : ", x$jobname[i])
+		check_dep_sub_type(dep = x$dep_type[i],
+											 sub = x$sub_type[i],
+											 p.sub = x$sub_type[i-1],
+											 p.dep = x$sub_type[i-1],
+											 verbose = verbose)
+	}
 	invisible(x)
+}
+
+##      scatter --(serial)--> scatter
+##      scatter --(serial)--> scatter
+##      scatter --(gather)--> scatter
+##      scatter --(gather)--> serial
+##      serial  --(serial)--> scatter
+##      serial  --(burst)--> scatter
+check_dep_sub_type <- function(dep, sub,
+													p.dep, p.sub,
+													verbose = get_opts("verbose")){
+	v = verbose
+	p.dep = ifelse(length(p.dep) == 0, "none", p.dep)
+	p.sub = ifelse(length(p.sub) == 0, "none", p.sub)
+
+	if(v) message("dep: ", dep, " sub: ", sub, " p.sub: ", p.sub, " p.dep: ", p.dep)
+
+	## one to one
+	if(dep == "serial" & sub == "serial"){
+		if(v) message("rel: simple one:one")
+	}else if(dep == "serial" & sub == "scatter" & p.sub == "scatter"){
+		if(v) message("rel: complex one:one")
+
+	## one to many
+	}else if(p.sub == "serial" & sub == "scatter" & dep == "burst"){
+		if(v) message("rel: one:many")
+	}else if(p.sub == "serial" & sub == "scatter" & dep == "serial"){
+		if(v) stop("rel: one:many. Please replace dep_type to burst")
+	}else if(p.sub == "scatter" & sub == "scatter" & dep == "burst"){
+		if(v) stop("rel: one:many. Please replace previous sub_type to serial")
+
+	## many to one
+	}else if(p.sub == "scatter" & sub == "serial" & dep == "gather"){
+		if(v) message("rel: many:one")
+	}else if(p.sub == "scatter" & sub == "scatter" & dep == "gather"){
+		if(v) message("rel: many:one. Please change sub_type to serial")
+	}else{
+	}
+
 }
