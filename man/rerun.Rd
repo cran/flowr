@@ -4,35 +4,62 @@
 \alias{rerun}
 \alias{rerun.character}
 \alias{rerun.flow}
-\title{rerun}
+\title{Re-run a pipeline in case of hardware or software failures.}
 \usage{
 rerun(x, ...)
 
 \method{rerun}{character}(x, ...)
 
 \method{rerun}{flow}(x, mat, def, start_from, execute = TRUE, kill = TRUE,
-  ...)
+  select, ignore, verbose = get_opts("verbose"), ...)
 }
 \arguments{
-\item{x}{Either path to flow folder or the \link{flow} object which has been 'returned' from \link{submit_flow}.}
+\item{x}{flow working directory}
 
-\item{...}{not used}
+\item{...}{passed onto to_flow}
 
-\item{mat}{path to flow_mat. should fetch on the fly}
+\item{mat}{(optional) flowmat fetched from previous submission if missing. For more information regarding the format refer to \link{to_flowmat}}
 
-\item{def}{path to should fetch on the fly}
+\item{def}{(optional) flowdef fetched from previous submission if missing.  For more information regarding the format refer to \link{to_flowdef}}
 
-\item{start_from}{which job to start from}
+\item{start_from}{which job to start from, this is a job name.}
 
 \item{execute}{[logical] whether to execute or not}
 
-\item{kill}{logical indicating whether to kill the jobs from old flow}
+\item{kill}{(optional) logical indicating whether to kill the jobs from the previous execution of flow.}
+
+\item{select}{select a subset of jobs to rerun [character vector]}
+
+\item{ignore}{ignore a subset of jobs to rerun [character vector]}
+
+\item{verbose}{A numeric value indicating the amount of messages to produce.
+ Values are integers varying from 0, 1, 2, 3, .... Please refer to the \link{verbose} page for more details.
+[\code{get_opts("verbose")}] [1]}
 }
 \description{
-rerun
+\itemize{
+\item \strong{hardware} no change required, simple rerun: \code{rerun(x=flow_wd)}
+\item \strong{software} either a change to flowmat or flowdef has been made: \code{rerun(x=flow_wd, mat = new_flowmat, def = new_flowdef)}
+}
+
+\strong{NOTE:}
+
+
+\emph{flow_wd}: flow working directory, same input as used for \link{status}
 }
 \details{
-We need path to the flow folder (\code{wd}). The \link{flow} object needs to have upate 'base_path' slow with wd (the path to the flow folder). Also its important to know that we need details regarding the previous submission from flow_details.txt file. Which should typically be in \code{wd}
+This function fetches details regarding the previous execution from the flow working directory (flow_wd).
+
+It reads the \link{flow} object from the flow_details.rds file, and extracts flowdef and flowmat from it
+using \link{to_flowmat} and \link{to_flowdef} functions.
+
+\strong{Using new flowmat OR flowdef for re-run}:
+
+Optionally, if either of flowmat or flowdef are supplied; supplied ones are used instead of those
+extracted from previous submission.
+
+This functions efficiently updates job details of the latest submission into the previous file; thus information
+regarding previous job ids and their status is not lost.
 }
 \examples{
 \dontrun{

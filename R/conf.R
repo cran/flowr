@@ -6,22 +6,31 @@
 flowopts = new.env()
 
 #' @rdname opts_flow
-#' @title Default options/params used in ngsflows and flowr
+#' 
+#' @aliases set_opts get_opts load_opts
+#' 
+#' @title Default options/params used in flowr and ngsflows
 #'
 #' @description
-#' There are three helper functions which attempt to manage params used by flowr and ngsflows:
+#' There are three helper functions which attempt to manage parameters used by flowr and ngsflows:
 #' \itemize{
-#' \item \link{get_opts} OR \code{opts_flow$get}: show all default options
-#' \item \link{set_opts} OR \code{opts_flow$set}: set default options
-#' \item \link{load_opts} OR \code{opts_flow$load}: load options specified in a tab seperated text file
+#' \item \link[params]{get_opts} OR \code{opts_flow\$get()}: show all default options
+#' \item \link[params]{set_opts} OR \code{opts_flow\$set()}: set default options
+#' \item \link[params]{load_opts} OR \code{opts_flow\$load()}: load options specified in a tab seperated text file
 #' }
-#' For more details regarding these funtions refer to \link{params}.
+#' For more details regarding these funtions refer to \link{params} package.
 #'
 #' @param ... \itemize{
 #' \item get: names of options to fetch
 #' \item set: a set of options in a name=value format seperated by commas
 #' }
 #'
+#' @usage 
+#' 
+#' get_opts(...)
+#' set_opts(...)
+#' load_opts(...)
+#' 
 #' @details
 #' By default flowr loads, \code{~/flowr/conf/flowr.conf} and \code{~/flowr/conf/ngsflows.conf}
 #'
@@ -51,6 +60,8 @@ flowopts = new.env()
 #'	|verbose           |FALSE                    |
 #'	}
 #'
+#' @seealso \link{fetch} \link[params]{params} \link[params]{read_sheet}
+#' 
 #' @examples
 #' ## Set options: set_opts()
 #' opts = set_opts(flow_run_path = "~/mypath")
@@ -58,8 +69,8 @@ flowopts = new.env()
 #' opts = set_opts(.dots = list(flow_run_path = "~/mypath"))
 #'
 #' ## load options from a configuration file: load_opts()
-#' myconfile = fetch_conf("flowr.conf")
-#' load_opts(myconfile)
+#' conffile = fetch_conf("flowr.conf")
+#' load_opts(conffile)
 #'
 #' ## Fetch options: get_opts()
 #' get_opts("flow_run_path")
@@ -67,26 +78,30 @@ flowopts = new.env()
 #'
 #' @export
 #' @importFrom params new_opts
+
 opts_flow = new_opts(flowopts)
 
 
-
-#' @rdname opts_flow
+#' @aliases params
 #' @export
 get_opts <- function(...){
 	opts_flow$get(...)
 }
 
-#' @rdname opts_flow
+#' @aliases params
 #' @export
 set_opts <- function(...){
 	opts_flow$set(...)
 }
 
-#' @rdname opts_flow
+#' @aliases params
 #' @export
 load_opts <- function(...){
 	opts_flow$load(...)
+	
+	## certain opts need to be numeric
+	set_opts(verbose = as.numeric(get_opts("verbose")))
+	
 }
 
 #devtools::install("~/Dropbox/public/github_params")

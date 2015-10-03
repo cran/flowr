@@ -3,9 +3,11 @@
 # })
 
 #' @rdname submit_flow
-#' @title submit_flow
-#' @description submit_flow
-#' @aliases submit_flow
+#' 
+#' @title Submit a flow to the cluster
+#' 
+#' @description 
+#' Submit a flow to the cluster or perform a dry-run to check and debug issues.
 #'
 #' @param x a \code{object} of class \code{flow}.
 #' @param execute \code{logical} whether or not to submit the jobs
@@ -17,13 +19,19 @@
 #' @param dump dump all the flow details to the flow path
 #' @param ... Advanced use. Any additional parameters are passed on to \link{submit_job} function.
 #'
+#' @details 
+#' NOTE:
+#' Even if you want to kill the flow, its best to let submit_flow do its job, when done simply use \code{kill(flow_wd)}. 
+#' If submit_flow is interrupted, files like flow_details.rds etc are not created, thus flowr looses the association 
+#' of jobs with flow instance and cannot monitor, kill or re-run the flow.
 #'
 #' @export
 #' @examples
 #' \dontrun{
 #' submit_flow(fobj = fobj, ... = ...)}
 submit_flow <- function(x, verbose = get_opts("verbose"), ...) {
-	if(verbose) message("input x is ", class(x))
+	if(verbose > 1)
+		message("input x is ", class(x))
 	UseMethod("submit_flow")
 }
 
@@ -47,6 +55,7 @@ parse_prevjobids <- function(x){
 #' @rdname submit_flow
 #' @param .start_jid Job to start this submission from. Advanced use, should be 1 by default.
 #' @importFrom tools file_path_as_absolute
+#' @importFrom utils txtProgressBar
 #' @export
 submit_flow.flow <- function(x,
 														 verbose = get_opts("verbose"),
@@ -100,11 +109,19 @@ submit_flow.flow <- function(x,
 	## prevjob is null but dep_type exists --- > problem, check should detect.
 	## split dependency, if multiple previous jobs
 
-	for(i in .start_jid:length(x@jobs)){
+	#x <- pbsapply(1:length(x@jobs), function(i, x = x){
+	
+	from=.start_jid;to=length(x@jobs)
+	if(to > from)
+		pb <- txtProgressBar(min = from, max = to, style = 3)
+	for(i in from:to){
+		if(verbose > 0 & to > from)
+			pb$up(i)
 		## ------ check if there are any dependencies
 		previous_job <- x@jobs[[i]]@previous_job
-		if(verbose) message("Working on, ", i, "with prev: ", previous_job)
-
+		if(verbose > 1) 
+			message("Working on job ", i, " with previous job: ", previous_job)
+		
 		## if there is a previous job
 		if(prevjob_exists(previous_job)){
 			## --- split multiple dependencies as a list
@@ -114,7 +131,7 @@ submit_flow.flow <- function(x,
 			## split the MATRIX by rowindex, into a LIST
 			x@jobs[[i]]@dependency <- split(previds, row(previds))
 		}
-	
+		
 		## ------ submit the job, get updates job object
 		x@jobs[[i]] <- submit_job(jobj = x@jobs[[i]],
 															fobj = x,
@@ -122,12 +139,15 @@ submit_flow.flow <- function(x,
 															job_id=i,
 															verbose = verbose, ...)
 	}
+	if( to > from )
+		close(pb)
+	
 
 	x@status <- "dry-run"
 	if(execute){
 		x@status <- "submitted"
 	}else{
-		message("Test Successful!\n",
+		message("Dry Run Successful!\n",
 						"You may check this folder for consistency. ",
 						"Also you may submit again with execute=TRUE\n",
 						x@flow_path)

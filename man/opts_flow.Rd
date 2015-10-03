@@ -7,17 +7,13 @@
 \alias{load_opts}
 \alias{opts_flow}
 \alias{set_opts}
-\title{Default options/params used in ngsflows and flowr}
+\title{Default options/params used in flowr and ngsflows}
 \format{\code{opts_flow}}
 \usage{
 flowopts
 
-opts_flow
-
 get_opts(...)
-
 set_opts(...)
-
 load_opts(...)
 }
 \arguments{
@@ -27,13 +23,13 @@ load_opts(...)
 }}
 }
 \description{
-There are three helper functions which attempt to manage params used by flowr and ngsflows:
+There are three helper functions which attempt to manage parameters used by flowr and ngsflows:
 \itemize{
-\item \link{get_opts} OR \code{opts_flow$get}: show all default options
-\item \link{set_opts} OR \code{opts_flow$set}: set default options
-\item \link{load_opts} OR \code{opts_flow$load}: load options specified in a tab seperated text file
+\item \link[params]{get_opts} OR \code{opts_flow\$get()}: show all default options
+\item \link[params]{set_opts} OR \code{opts_flow\$set()}: set default options
+\item \link[params]{load_opts} OR \code{opts_flow\$load()}: load options specified in a tab seperated text file
 }
-For more details regarding these funtions refer to \link{params}.
+For more details regarding these funtions refer to \link{params} package.
 }
 \details{
 By default flowr loads, \code{~/flowr/conf/flowr.conf} and \code{~/flowr/conf/ngsflows.conf}
@@ -71,12 +67,15 @@ opts = set_opts(flow_run_path = "~/mypath")
 opts = set_opts(.dots = list(flow_run_path = "~/mypath"))
 
 ## load options from a configuration file: load_opts()
-myconfile = fetch_conf("flowr.conf")
-load_opts(myconfile)
+conffile = fetch_conf("flowr.conf")
+load_opts(conffile)
 
 ## Fetch options: get_opts()
 get_opts("flow_run_path")
 get_opts()
+}
+\seealso{
+\link{fetch} \link[params]{params} \link[params]{read_sheet}
 }
 \keyword{datasets}
 

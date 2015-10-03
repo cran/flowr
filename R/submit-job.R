@@ -1,8 +1,9 @@
 
 ## --- submit job as part of a flow, this would be called from function flow
 
-#' @title submit_job
-#' @description submit_job
+#' @title Submit a step of a flow
+#' @description 
+#' Internal function (used by submit_flow), which submit a single step of a flow.
 #'
 #' @param jobj Object of calls \link{job}
 #' @param fobj Object of calls \link{flow}
@@ -64,7 +65,9 @@ submit_job <- function (jobj, fobj, job_id, execute = FALSE, verbose = FALSE, ..
 		cmd <- render_queue_cmd(jobj = obj, fobj = fobj, index=i)
 
 		## --- write script to file
-		if(verbose) message("Submitting using script:\n", cmd, "\n")
+		## this if for debugging
+		if(verbose > 2)
+			message("Submitting using script:\n", cmd, "\n")
 
 		## --- return CMD if local, else jobid
 		if(jobj@platform == "local")
@@ -95,16 +98,15 @@ submit_job <- function (jobj, fobj, job_id, execute = FALSE, verbose = FALSE, ..
 
 
 
-#' render_queue_cmd
-#'
-#' @param file path to the output file
-#' @param jobj job object
-#' @param index If more than one, which command to focus on. Can be from \code{1:length(cmds)}
-#' @param fobj flow object
+# render_queue_cmd
+#
+# @param file path to the output file
+# @param jobj job object
+# @param index If more than one, which command to focus on. Can be from \code{1:length(cmds)}
+# @param fobj flow object
 #' @importFrom utils tail
-#'
 render_queue_cmd <- function(jobj, file, index, fobj){
-	if(get_opts("verbose"))
+	if(get_opts("verbose") > 1)
 		message("Working on ", jobj@name, " with index ", index)
 	
 	## --- get platform of previous job
@@ -139,6 +141,9 @@ render_queue_cmd <- function(jobj, file, index, fobj){
 	l$TRIGGER = jobj@trigger[index]
 
 	## --- apply whisker.render on {{CMD}}
+	## render user CMD, if it has {{{CPU}}} etc...
+	l$CMD = gsub("%>", "}}}", gsub("<%", "{{{", l$CMD, fixed = TRUE))
+	l$CMD = whisker_render(l$CMD, data = l)$out
 
 
 	## --- find the relevent conf file(s)
@@ -148,8 +153,6 @@ render_queue_cmd <- function(jobj, file, index, fobj){
 	template <- paste(readLines(plat_conf), collapse = "\n")
 	#out = whisker.render(template = template, data = l)
 
-	## render user CMD, if it has {{{CPU}}} etc...
-	l$CMD = whisker_render(l$CMD, data = l)$out
 	## render HPCC script, if it has {{{CPU}}} etc...
 	out = whisker_render(template, data = l)$out
 
@@ -175,7 +178,12 @@ create_queue_cmd=render_queue_cmd
 #cmd <- .create_queue_cmd(obj, file=files[i], index=i, fobj = fobj)
 
 
-#' @title Wrapper around whisker.render with some sugar on it...
+#' @title 
+#' Wrapper around whisker.render with some additional checks
+#' 
+#' @description 
+#' Internal function (used by submit_job), which creates a submission script using 
+#' platform specific templates.
 #'
 #' @description This is a wrapper around \link{whisker.render}
 #' @param template template used
@@ -195,9 +203,8 @@ whisker_render <- function(template, data) {
 	mis = vars[!vars %in% names(data)]
 
 	if(length(mis) > 0)
-		stop("Some variables are specfied in script template, but missing in job object: ",
-		paste(mis, collapse = " "),
-		".\nRefer to ?job, for details on variable names that can be used.")
+		stop("Some variables are specfied in script template, but missing in data ",
+				 paste(mis, collapse = " "))
 	out = whisker.render(template, data)
 	return(list(out = out, vars = vars, mis = mis))
 }

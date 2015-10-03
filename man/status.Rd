@@ -6,44 +6,60 @@
 \alias{get_status.data.frame}
 \alias{get_status.flow}
 \alias{status}
-\title{status}
+\title{Monitor status of flow(s)}
 \usage{
-status(x, out_format = "markdown")
+status(x, use_cache = FALSE, verbose = get_opts("verbose"),
+  out_format = "markdown")
 
 get_status(x, ...)
 
-\method{get_status}{character}(x, out_format = "markdown", ...)
+\method{get_status}{flow}(x, verbose, use_cache, out_format, ...)
 
-\method{get_status}{data.frame}(x, ...)
+\method{get_status}{character}(x, verbose, use_cache, out_format, ...)
 
-\method{get_status}{flow}(x, out_format = "markdown", ...)
+\method{get_status}{data.frame}(x, verbose, use_cache, ...)
 }
 \arguments{
 \item{x}{path to the flow root folder or a parent folder to summarize several flows.}
 
-\item{out_format}{passed onto knitr:::kable. supports: markdown, rst, html...}
+\item{use_cache}{This skips checking status of jobs which have already been completed a
+and assumes no new jobs were submitted in the flow(s) being monitored. [FALSE]}
+
+\item{verbose}{A numeric value indicating the amount of messages to produce.
+ Values are integers varying from 0, 1, 2, 3, .... Please refer to the \link{verbose} page for more details.
+[\code{get_opts("verbose")}] [1]}
+
+\item{out_format}{passed onto knitr:::kable. supports: markdown, rst, html... [markdown]}
 
 \item{...}{not used}
 }
 \description{
-Summarize status of executed flow(x)
+Summarize status of a flow OR multiple flows OR a high-level summary of all flows in a folder.
 }
 \details{
 basename(x) is used in a wild card search.
 
 \itemize{
-\item If x is a path with a single flow, it outputs the status of one flow.
-\item If the path has more than one flow then this could give a summary of **all** of them.
-\item Instead if x is supplied with paths to more than one flow, then this individually prints status of each.
+  \item Get status of all the flows:
+  (all flows with 'sleep_pipe' in their name are checked and their status is shown)
+  <br>
+  \code{flowr status x=~/flowr/runs/sleep_pipe*}
+  \item Provide a high level summary of ALL flows in a folder:
+  <br>
+   \code{flowr status x=~/flowr/runs}
 }
 
-Alternatively, x can also be a flow object
+Use \strong{use_cache}=TRUE to speed up checking the status.
+This assumes that no new jobs have been submitted and skips (re-)checking status of
+completed jobs.
+
+Once all the jobs have been submitted to the cluster you may always use \code{use_cache=TRUE}.
 }
 \examples{
 \dontrun{
 status(x = "~/flowr/runs/sleep_pipe*")
 ## an example for running from terminal
-flowr status x=path_to_flow_directory cores=6
+flowr status x=path_to_flow_directory
 }
 }
 

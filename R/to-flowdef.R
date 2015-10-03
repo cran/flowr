@@ -2,56 +2,102 @@
 #setClass("flowdef", contains = "data.frame")
 #http://www.carlboettiger.info/2013/09/11/extending-data-frame-class.html
 
-#' @rdname as.flowdef
-#' @title flow definition
-#' @description  Reeading a flow definition file and checking it.
-#' @param x can be a data.frame or a path for a flow definition file
-#' @param ... passed onto check.flowdef
-#' @export
-as.flowdef <- function(x, ...){
-	## ---- assuming x is a file
-	if(is.flowdef(x))
-		return(check(x))
-	if(is.data.frame(x))
-		y = x
-	if(is.character(x)){
-		if(!file.exists(x))
-			stop(error("no.def"), x)
-		message("def seems to be a file, reading it...")
-		y <- read_sheet(x, id_column = "jobname")
-	}
-	y$jobid <- 1:nrow(y)
-	class(y) <- c("flowdef", "data.frame")
-	y = check(y, ...)
-	return(y)
-}
-
-
-#' @rdname as.flowdef
-#' @export
-is.flowdef <- function(x){
-	class(x)[1] == "flowdef"
-}
-
-
-## needs two new functions:
-## check resources
-## check relationships
-
-
-
-## -----------   this section deals with making a skeleton flowdef
 
 
 #' @rdname to_flowdef
+#' @aliases flowdef to_flowdef definition
+#' 
 #' @title
-#' Create a skeleton flow definition using a flowmat.
+#' Flow Definition defines how to stich pieces of the (work)flow into a flow.
 #'
-#' @description Creation of a skeleton flow definition with several default values.
+#' @description 
+#' This function enables creation of a skeleton flow definition with several default values, using a 
+#' flowmat.
+#' To customize the flowdef, one may supply parameters such as sub_type and dep_type upfront.
+#' As such, these params must be of the same length as number of unique jobs using in the flowmat.
+#' 
+#' {
+#' Each row in this table refers to one step of the pipeline. 
+#' It describes the resources used by the step and also its relationship with other steps, 
+#' especially, the step immediately prior to it.
+#' } <br><br>
+#' 
+#' \strong{Submission types:} 
+#' \emph{This refers to the sub_type column in flow definition.}<br>
+#' 
+#' Consider an example with three steps A, B and C. 
+#' A has 10 commands from A1 to A10, similarly B has 10 commands B1 through B10 and 
+#' C has a single command, C1.
+#' Consider another step D (with D1-D3), which comes after C.
+#' 
+#' step (number of sub-processes)
+#' A (10)   ----> B (10)  -----> C (1) -----> D (3)
+#' 
+#' 
+#'  
+#' 
+#' \itemize{
+#' \item \code{scatter}: submit all commands as parallel, independent jobs. 
+#' 
+#' 	\emph{Submit A1 through A10 as independent jobs}
+#' 	\item \code{serial}: run these commands sequentially one after the other. 
+#' 	
+#' 	- \emph{Wrap A1 through A10, into a single job.}
+#'}
 #'
-#' All params may be of length one, or same as the number of jobnames
+#' \strong{Dependency types}
 #'
-#' @param x can a path to a flowmat, flomat or flow object.
+#' \emph{This refers to the dep_type column in flow definition.}
+#' 
+#' \itemize{
+#' \item \code{none}: independent job.
+#' 		\itemize{\item \emph{Initial step A has no dependency}}
+#' 	\item \code{serial}: \emph{one to one} relationship with previous job. 
+#' 	\itemize{ \item \emph{B1 can start as soon as A1 completes, and B2 starts just after A2 and so on.}}
+#' 	\item \code{gather}: \emph{many to one}, wait for \strong{all} commands in the previous job to finish then start the  current step. 
+#' 	\itemize{\item \emph{All jobs of B (1-10), need to complete before C1 starts}}
+#' 	\item \code{burst}: \emph{one to many} wait for the previous step which has one job and start processing all cmds in the current step. 
+#' 	
+#' 	- \emph{D1 to D3 are started as soon as C1 finishes.}
+#' }
+#' 
+#' @format
+#' This is a tab separated file, with a minimum of 4 columns:<br>
+#' 
+#' \emph{required columns}:<br>
+#' \itemize{
+#' 
+#' \item{\code{jobname}}: Name of the step
+#' 
+#' \item{\code{sub_type}}: Short for submission type, 
+#'  refers to, how should multiple commands of this step be submitted. Possible values are `serial` or `scatter`. 
+#'  
+#' \item{\code{prev_jobs}}: Short for previous job, this would be the jobname of the previous job. 
+#' This can be NA/./none if this is a independent/initial step, and no previous step is required for this to start. 
+#' Additionally, one may use comma(s) to define multiple previous jobs (A,B).
+#' 
+#' \item{\code{dep_type}}: Short for dependency type, 
+#' refers to the relationship of this job with the one defined in `prev_jobs`. 
+#' This can take values `none`, `gather`, `serial` or `burst`.
+#' 
+#' }
+#' 
+#' \emph{resource columns} (recommended):<br>
+#' 
+#' Additionally, one may customize resource requirements used by each step.
+#' The format used varies and depends to the computing platform. Thus its best to refer to 
+#' your institutions guide to specify these.
+#' 
+#' \itemize{
+#' 	\item{\code{cpu_reserved}} integer, specifying number of cores to reserve [1]
+#'	\item{\code{memory_reserved}} Usually in KB [2000]
+#'	\item{\code{nodes}} number of server nodes to reserve, most tools can only use multiple cores on
+#'	a \strong{single} node [1]
+#'	\item{\code{walltime}} maximum time allowed for a step, usually in a HH:MM or HH:MM:SS format. [1:00]
+#'	\item{\code{queue}} the queue to use for job submission [short]
+#' }
+#'
+#' @param x can a path to a flowmat, flowmat or flow object.
 #' @param sub_type submission type, one of: scatter, serial. Character, of length one or same as the number of jobnames
 #' @param dep_type dependency type, one of: gather, serial or burst. Character, of length one or same as the number of jobnames
 #' @param prev_jobs previous job name
@@ -60,9 +106,11 @@ is.flowdef <- function(x){
 #' @param memory_reserved amount of memory required.
 #' @param cpu_reserved number of cpu's required
 #' @param walltime amount of walltime required
+#' @inheritParams to_flow
 #' @param ... not used
 #'
-#' @importFrom knitr kable
+#' @importFrom params kable
+#' 
 #' @export
 to_flowdef <- function(x, ...){
 	#message("input x is ", class(x)[1])
@@ -93,11 +141,14 @@ to_flowdef.flowmat <- function(x,
 															 platform = "torque",
 															 memory_reserved = "2000", ## in MB
 															 cpu_reserved = "1",
-															 walltime = "1:00", ...){
+															 walltime = "1:00",
+															 verbose = get_opts("verbose"), ...){
 
-	message("Creating a skeleton flow definition")
+	if(verbose)
+		message("Creating a skeleton flow definition")
 	jobnames <- unique(x$jobname)
-	message("Following jobnames detected: ",
+	if(verbose)
+		message("Following jobnames detected: ",
 					paste(jobnames, collapse = " "))
 
 	njobs = length(jobnames)
@@ -153,7 +204,6 @@ to_flowdef.flow <- function(x, ...){
 
 
 #' @rdname to_flowdef
-#' @description to_flowdef.character: x is a flowmat file.
 #' @importFrom utils write.table
 #' @export
 to_flowdef.character <- function(x, ...){
@@ -167,6 +217,42 @@ to_flowdef.character <- function(x, ...){
 	invisible(def)
 }
 
+
+#' @rdname to_flowdef
+#' @export
+as.flowdef <- function(x, ...){
+	## ---- assuming x is a file
+	if(is.flowdef(x))
+		return(check(x))
+	if(is.data.frame(x))
+		y = x
+	if(is.character(x)){
+		if(!file.exists(x))
+			stop(paste0(error("no.def"), x))
+		message("def seems to be a file, reading it...")
+		y <- read_sheet(x, id_column = "jobname")
+	}
+	y$jobid <- 1:nrow(y)
+	class(y) <- c("flowdef", "data.frame")
+	y = check(y, ...)
+	return(y)
+}
+
+
+#' @rdname to_flowdef
+#' @export
+is.flowdef <- function(x){
+	class(x)[1] == "flowdef"
+}
+
+
+## needs two new functions:
+## check resources
+## check relationships
+
+
+
+## -----------   this section deals with making a skeleton flowdef
 
 
 ## examples

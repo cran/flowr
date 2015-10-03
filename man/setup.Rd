@@ -2,19 +2,30 @@
 % Please edit documentation in R/setup.R
 \name{setup}
 \alias{setup}
-\title{Setup and initialize some scripts.}
+\title{Setup and initialize flowr}
 \usage{
-setup(bin = "~/bin", flow_base_path = get_opts("flow_base_path"))
+setup(bin = "~/bin", flow_base_path = get_opts("flow_base_path"),
+  flow_run_path = get_opts("flow_run_path"),
+  flow_conf_path = get_opts("flow_conf_path"),
+  flow_pipe_path = get_opts("flow_pipe_paths"))
 }
 \arguments{
 \item{bin}{path to bin folder}
 
-\item{flow_base_path}{the root folder for all flowr operations}
+\item{flow_base_path}{The base of flowr configuration and execution folders.}
+
+\item{flow_run_path}{Path to a folder. Main operating folder for this flow. [\code{get_opts("flow_run_path")}]
+[\code{~/flowr/runs}].}
+
+\item{flow_conf_path}{Flowr configuration folder, used by \link{fetch_conf}.}
+
+\item{flow_pipe_path}{Folder with all pipelines, used by \link{fetch_pipes}.}
 }
 \description{
-Setup and initialize some scripts.
+This functions creates a directory structure in user's home directory.
+Additionally it creates a shortcut to the \code{flowr} helper script in \code{~/bin}.
 }
 \details{
-Will add more to this to identify cluster and aid in other things
+Will add more to this, to identify cluster and aid in other things.
 }
 
