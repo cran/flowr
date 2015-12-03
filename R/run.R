@@ -3,27 +3,39 @@
 #' Run automated Pipelines
 #'
 #' @description
-#' Run complete pipelines, by wrapping several steps into one convinient function:
+#' Run complete pipelines, by wrapping several steps into one 
+#' convinient function.
 #' 
-#' Taking \code{sleep_pipe} as a example.
+#' NOTE: please use flowr version 0.9.8.9010 or higher.
+#' 
+#' In summary, this function performs the following steps:
+#' 
 #' \itemize{
-#'   \item Use \link{fetch_pipes} to get paths to a Rscript, flowdef file and optionally a configuration file
-#'   with various default options used.
-#'   \item Create a flowmat (using the function defined in the Rscript)
-#'   \item Create a `flow` object, using flowmat created and flowdef (as fetched using fetch_pipes)
-#'   \item Submit the flow to the cluster (using \link{submit_flow})
+#' \item the argument \code{x} defines the name of the pipeline. 
+#' Say, for example \code{sleep_pipe}.
+#'  \item \link{fetch_pipes}: finds the pipeline definition 
+#'  (\code{sleep_pipe.R}, \code{sleep_pipe.def} and
+#'  \code{sleep_pipe.conf} files)
+#'  \item \code{sleep_pipe(\dots)}: Create all the required commands 
+#'  (\code{flowmat})
+#'   \item \link{to_flow}: Use \code{flowmat} and 
+#'   \code{sleep_pipe.def} to create a flow object.
+#'   \item \link{submit_flow}: Submit the flow to the cluster.
 #' }
 #'
 #' @param x name of the pipeline to run. This is a function called to create a flow_mat.
 #' @param def flow definition
 #' @param flow_run_path passed onto to_flow. Default it picked up from flowr.conf. Typically this is ~/flowr/runs
+#' @param wd an alias to flow_run_path
+#' @param rerun_wd if you need to run, supply the previous working dir
+#' @param start_from the step to start a rerun from. Intitutively, this is ignored in a fresh run and only used in re-running a pipeline.
+#' @param conf a tab-delimited configuration file with path to tools and default parameters. See \link{fetch_pipes}.
 #' @param platform what platform to use, overrides flowdef
 #' @param execute TRUE/FALSE
 #' @param ... passed onto the pipeline function as specified in x
 #'
 #'
 #' @export
-#'
 #' @importFrom params load_opts read_sheet write_sheet
 #'
 #' @aliases run_flow
@@ -55,14 +67,16 @@
 #' }
 run <- function(x,
 	platform,
-	def,
-	flow_run_path = get_opts("flow_run_path"),
+	def, conf, 
+	wd = opts_flow$get("flow_run_path"),
+	flow_run_path = wd,
+	rerun_wd, start_from,
 	execute = FALSE,  ...){
 
-	#print(get_opts("flow_run_path"))
+	#print(opts_flow$get("flow_run_path"))
 	## find a Rscript with name {{x}}.R
 
-	message("\n##--- fetching pipeline... ")
+	message("\n> fetching pipeline... ")
 	pip = fetch_pipes(x, last_only = TRUE)
 
 	if(missing(x))
@@ -74,35 +88,49 @@ run <- function(x,
 	func = get(x) ## find function of the original name
 
 
-	message("\n##--- loading confs....")
+	message("\n> loading confs....")
 	## load default options for the pipeline
 	confs = c(fetch_conf("flowr.conf"),
 		fetch_conf("ngsflows.conf"),
 		pip$conf)
 	print(kable(as.data.frame(confs)))
-	load_opts(confs, verbose = FALSE, check = FALSE)
+	opts_flow$load(confs, verbose = FALSE, check = FALSE)
+	
+	if(!missing(conf))
+	  opts_flow$load(conf, verbose = FALSE, check = FALSE)
 
-	message("\n##--- creating flowmat....")
+	message("\n> creating flowmat....")
 	## crate a flowmat
 	args <- list(...)
 	out = do.call(func, args)
 
-
-	message("\n##--- stitching a flow object....")
+	## fetched from the latest conf file ONLY
+	module_cmds = opts_flow$get("module_cmds")
+	
+	message("\n> stitching a flow object....")
 	## get a flowdef
 	if(missing(def))
 		def = as.flowdef(pip$def)
-	## create a flow object
-	fobj = to_flow(x = out$flowmat,
-		def = def,
-		platform = platform,
-		flowname = x,
-		flow_run_path = flow_run_path)
-
-	## submit the flow
-	message("\n##--- submitting....")
-	fobj = submit_flow(fobj, execute = execute)
-
+	
+	if(missing(rerun_wd)){
+		## create a flow object
+		fobj = to_flow(x = out$flowmat,
+									 def = def,
+									 platform = platform,
+									 flowname = x,
+									 module_cmds = module_cmds,
+									 flow_run_path = flow_run_path)
+		
+		# submit the flow
+		message("\n--> submitting ...")
+		fobj = submit_flow(fobj, execute = execute)
+	
+	}else{
+		
+		fobj = rerun(x = rerun_wd, mat = out$flowmat, def = def, start_from = start_from, execute = execute)
+		
+	}
+	
 	invisible(fobj)
 }
 

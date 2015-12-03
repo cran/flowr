@@ -1,38 +1,8 @@
----
-title: "flowr"
-subtitle: "Streamlining Workflows"
-author: Sahil Seth
-date: "`r Sys.Date()`"
-output: 
-  rmarkdown::html_document: 
-    keep_md: yes
-    toc: true
-    toc_depth: 4
-vignette: >
-  %\VignetteIndexEntry{Installation, Configuration and FAQs}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
-packagedocs:
-    toc: true
-navpills: |
-  <li><a href='overview.html'>Overview</a></li>
-  <li class="active"><a href='install-conf.html'>Install</a></li>
-  <li><a href='tutorial.html'>Tutorial</a></li>
-  <li><a href='rd.html'>Help</a></li>
-  <li><a href='news.html'>News</a></li>
-  <li><a href='https://github.com/sahilseth/flowr'>Github <i class='fa fa-github'></i></a></li>
-brand: |-
-  <a href="http://docs.flowr.space">
-  <img src='files/logo_red.png' alt='flowr icon' width='50px' height='40px' style='margin-top: -20px;margin-bottom: -20px'>
-  </a>
-copyright: Licence MIT
-source: "github.com/sahilseth/flowr/tree/devel/vignettes/flowr_install.Rmd"
----
+# flowr
+Sahil Seth  
+`r Sys.Date()`  
 
-```{r echo=FALSE, message=FALSE}
-library(params)
-library(flowr)
-```
+
 
 # Installation
 
@@ -41,7 +11,8 @@ Requirements:
 - R version > 3.1, preferred 3.2
 
 
-```{r eval=FALSE}
+
+```r
 ## for a latest official version (from CRAN)
 install.packages("flowr", repos = CRAN="http://cran.rstudio.com")
 
@@ -50,12 +21,12 @@ install.packages("flowr", repos = c(CRAN="http://cran.rstudio.com", DRAT="http:/
 
 ## OR cutting edge devel version
 devtools::install_github("sahilseth/flowr", ref = "devel")
-
 ```
 
 After installation run `setup()`, this will copy the flowr's helper script to `~/bin`. Please make sure that this folder is in your `$PATH` variable.
 
-```{r eval=FALSE}
+
+```r
 library(flowr)
 setup()
 ```
@@ -315,11 +286,21 @@ For example values in `cpu_reserved` column would be populated as `{{{CPU}}}` in
 The following table provides a mapping between the flow definition columns and variables in the [submission templates](https://github.com/sahilseth/flowr/blob/master/inst/conf):
 
 
-```{r build_pipe_flow_def_cols, echo=FALSE, message=FALSE}
-#extdata = file.path(system.file(package = "flowr"), "extdata")
-mat = read_sheet("files/flow_def_columns.txt")
-kable(mat, col.names = c("flowdef variable", "submission template variable"))
-```
+
+|flowdef variable |submission template variable |
+|:----------------|:----------------------------|
+|nodes            |NODES                        |
+|cpu_reserved     |CPU                          |
+|memory_reserved  |MEMORY                       |
+|email            |EMAIL                        |
+|walltime         |WALLTIME                     |
+|extra_opts       |EXTRA_OPTS                   |
+|*                |JOBNAME                      |
+|*                |STDOUT                       |
+|*                |CWD                          |
+|*                |DEPENDENCY                   |
+|*                |TRIGGER                      |
+|**               |CMD                          |
 
 `* These are generated on the fly` and `** This is gathered from flow mat`
 
@@ -390,7 +371,8 @@ Issues is that whisker and params are not installed, and are not available in th
 
 Solution 1:
 
-```{r eval=FALSE}
+
+```r
 install.packages("whisker")
 install.packages("diagram")
 install.packages("flowr", repos = "http://sahilseth.github.io/drat")
@@ -398,7 +380,8 @@ install.packages("flowr", repos = "http://sahilseth.github.io/drat")
 
 Solution 2:
 
-```{r eval=FALSE}
+
+```r
 install.packages("flowr", repos = c(CRAN = "http://cran.rstudio.com", DRAT = "http://sahilseth.github.io/drat"))
 ```
 

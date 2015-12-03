@@ -7,13 +7,88 @@ output: html_document
 packagedocs:
     toc: true
 navpills: |
-  <li><a href='docs.html'>Overview</a></li>
+  <li><a href='overview.html'>Overview</a></li>
   <li><a href='install.html'>Install</a></li>
   <li><a href='tutorial.html'>Tutorial</a></li>
   <li><a href='rd.html'>Help</a></li>
   <li class="active"><a href='news.html'>News</a></li>
   <li><a href='https://github.com/sahilseth/flowr'>Github <i class='fa fa-github'></i></a></li>
+brand: |-
+  <a href="http://docs.flowr.space">
+  <img src='files/logo_red.png' alt='flowr icon' width='50px' height='40px' style='margin-top: -20px;margin-bottom: -20px'>
+  </a>
+copyright: Licence MIT
+source: "github.com/sahilseth/flowr/tree/devel/NEWS.md"
 ---
+
+<br>
+
+flowr 0.9.9.2 (cherries)
+----------------------------------------------
+> 2015-11-20
+
+tl;dr (**summary of changes**)
+
+- Better handling of multiple flows in terms of running and re-running.
+- Nicer and cleaner messages.
+
+
+**additions/changes to `flowr.conf` file**
+
+- **New:** option local_cores, which determines (max) number of cores to use when running local jobs.
+- **New:**: Now you can add a `module_cmds` variable to the config file, and this will be prefixed in all script of the pipeline. An example could be:
+- **New**: `flow_pipe_paths` now supports multiple paths, seperated by comma. The `fetch_pipes()` would split the vector at commas.
+
+
+- **IMP**: New version needs additional components in the `flowr.conf` file
+
+```diff
+# version >= 0.9.8.9004
+# max number of cores to use when running on a local server
+local_cores	4
+
+# default module of a pipeline
+# version >= 0.9.8.9015
+module_cmds	''
+
+# examples: one may define all modules used in a pipeline here, 
+# further one may specify any other command which should be run before 
+# script executes.
+#module_cmds	'module load samtools;export PATH=$PATH:/apps/bin'
+
+```
+
+
+**addition/changes to `status()`**
+
+- **New**: status gets a new argument to turn off progress bar if needed.
+- **New** enhanced `get_wds`/`status`, so that if current wd contains a flow_details file, status is shown for this folder and not sub-folder(s).
+
+```
+## now this works well !
+flowr status x=.
+```
+
+
+**addition/changes to `run()` and `rerun()` functions**
+
+- **New**: run function now accepts a custom configuration [`conf`], parameter. See `help(flowr::run)` for detail.
+The conf file would specify various parameters used for that pipeline.
+- **New**: `run()` re-running as well. i.e. One would generate a new set of commands etc. but execute in the previous folder; possibly from a inter-mediate step (trial feature).
+- **New**: Now `rerun()` supports multiple folders. Basically, one may specify a parent folder which has multiple flowr runs and ask it to re-run **ALL** of them again, from a specific intermediate step.
+- **New**: Flowr creates a new folder if there are multiple samples in the flowmat; basically containerizes the run, keeping the logs clean and debugging life easier.
+
+
+**other changes**
+
+- **New**: `to_flowdef()` can now guess submission and dependency types (experimental feature).
+- **IMP**: `to_flowdef` now adds a parameter `nodes`, to enable specifying number of nodes required per-job.
+- **IMP**: `opts_flow$get` replaces `get_opts`, for reliability etc. Also this closely follows how knitr options are set.
+- fixed bugs in documentation (changed the formatting of output messages).
+
+
+
+
 
 flowr 0.9.8 (blueberries)
 ----------------------------------------------
@@ -80,9 +155,9 @@ fetching statuses of previously completed jobs; this really speeding things up.
 
 - Several detailed changes to the documentation.
 
-flowr 0.9.7.10 (apples)
+flowr 0.9.7 (apples)
 ----------------------------------------------
-> 2015-08-22
+> 2015-08-22 (0.9.7.10)
 
 - This release adds and changes functionality of several functions. 
 - A new function run(), creates and submits a pipeline. Specifically it follows the following steps:
@@ -184,3 +259,9 @@ flowr 0.85
   make plot type 1 as default
 - get_flow_status():
   -exit_status: reports number of exited jobs (not sum of exit codes)
+
+<script src = "https://raw.githubusercontent.com/sahilseth/flowr/master/vignettes/files/googl.js"></script>
+
+Versioning:
+
+Loosely, following [fruits A-Z](http://www.greatgrubclub.com/a-z-fruit-veg#.Vk-gx4QzBRE).

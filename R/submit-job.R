@@ -106,7 +106,7 @@ submit_job <- function (jobj, fobj, job_id, execute = FALSE, verbose = FALSE, ..
 # @param fobj flow object
 #' @importFrom utils tail
 render_queue_cmd <- function(jobj, file, index, fobj){
-	if(get_opts("verbose") > 1)
+	if(opts_flow$get("verbose") > 1)
 		message("Working on ", jobj@name, " with index ", index)
 	
 	## --- get platform of previous job
@@ -133,8 +133,10 @@ render_queue_cmd <- function(jobj, file, index, fobj){
 	## --- dependency initially is a list which can have multiple values
 	## --- ignore a few of the slots
 	l <- l[! names(l) %in% c("format", "platform", "dependency")]
+	
 	## --- dependency here is a string according to the policies of the cluster platform
-	l <- c(l, dependency=dependency) ## add dependency to the list
+	module_cmds = as.character(fobj@module_cmds)
+	l <- c(l, dependency=dependency, module_cmds = module_cmds) ## add dependency to the list
 	names(l) = toupper(names(l)) ## get list of slots
 	l <- c(l, "CMD" = jobj@cmds[index])
 	l$STDERR=l$STDOUT=jobj@stdout[index]
