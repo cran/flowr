@@ -6,7 +6,7 @@ Description: This framework allows you to design and implement complex
     been built keeping in mind the needs of bioinformatics workflows. However, it is
     easily extendable to any field where a series of steps (shell commands) are to
     be executed in a (work)flow.
-Version: 0.9.9.5
+Version: 0.9.10
 Depends: R (>= 3.0.2), methods, params (>= 0.3), utils
 Imports: diagram, whisker, tools
 Suggests: reshape2, knitr, ggplot2, openxlsx, testthat, funr
@@ -15,10 +15,10 @@ URL: https://github.com/sahilseth/flowr
 BugReports: https://github.com/sahilseth/flowr/issues
 Authors@R: c(person("Sahil", "Seth", role = c("aut", "cre"), email = "me@sahilseth.com"))
 License: MIT + file LICENSE
-RoxygenNote: 5.0.1.9000
+RoxygenNote: 5.0.1
 NeedsCompilation: no
-Packaged: 2015-12-03 16:30:57 UTC; sahilseth
+Packaged: 2016-04-18 21:59:18 UTC; root
 Author: Sahil Seth [aut, cre]
 Maintainer: Sahil Seth <me@sahilseth.com>
 Repository: CRAN
-Date/Publication: 2015-12-03 17:54:26
+Date/Publication: 2016-04-19 01:17:29
