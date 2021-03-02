@@ -1,6 +1,20 @@
+---
+output: 
+    html_document: 
+       keep_md: yes
+packagedocs:
+    toc: false
+navpills: |
+  <li><a href='docs.html'>Overview</a></li>
+  <li><a href='install.html'>Install</a></li>
+  <li><a href='tutorial.html'>Tutorial</a></li>
+  <li><a href='rd.html'>Help</a></li>
+  <li><a href='news.html'>News</a></li>
+  <li><a href='https://github.com/flow-r/flowr'>Github <i class='fa fa-github'></i></a></li>
+---
 
 <!--brand: |-
-  <a href="http://docs.flowr.space">
+  <a href="http://flow-r.github.io/flowr">
   <img src='https://raw.githubusercontent.com/sahilseth/flowr/devel/vignettes/files/logo.png' alt='flowr icon' width='40px' height='40px' style='margin-top: -10px;'>
   </a>
 -->
@@ -14,7 +28,7 @@
 
 [![Build Status](https://travis-ci.org/sahilseth/flowr.svg?branch=master)](https://travis-ci.org/sahilseth/flowr)
 [![cran](http://www.r-pkg.org/badges/version/flowr)](https://cran.r-project.org/package=flowr)
-[![codecov.io](http://codecov.io/github/sahilseth/flowr/coverage.svg?branch=devel)](http://codecov.io/github/sahilseth/flowr?branch=devel)
+<!--[![codecov.io](http://codecov.io/github/sahilseth/flowr/coverage.svg?branch=devel)](http://codecov.io/github/sahilseth/flowr?branch=devel)-->
 ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/flowr)
 
 <!--
@@ -22,9 +36,9 @@
 -->
 
 
-## [![docs.flowr.space](https://raw.githubusercontent.com/sahilseth/flowr/devel/vignettes/files/logo.png) Streamlining Computing workflows](http://docs.flowr.space)
+## [![flow-r.github.io/flowr](https://raw.githubusercontent.com/sahilseth/flowr/devel/vignettes/files/logo.png) Streamlining Computing workflows](http://flow-r.github.io/flowr/)
 
-**Latest documentation: [docs.flowr.space](http://docs.flowr.space)**
+**Latest documentation: [flow-r.github.io/flowr](http://flow-r.github.io/flowr/)**
 
 
 
@@ -36,8 +50,8 @@ are to be executed in a (work)flow.
 
 ### Highlights
 
-- No new **syntax or language**. Put all shell commands as a tsv file called [flow mat](http://docs.flowr.space/overview.html#flow_matrix).
-- Define the [flow of steps](http://docs.flowr.space/overview.html#relationships) using a simple tsv file (serial, scatter, gather, burst...) called [flow def](http://docs.flowr.space/overview.html#flow_definition).
+- No new **syntax or language**. Put all shell commands as a tsv file called [flow mat](http://flow-r.github.io/flowr/overview.html#flow_matrix).
+- Define the [flow of steps](http://flow-r.github.io/flowr/overview.html#relationships) using a simple tsv file (serial, scatter, gather, burst...) called [flow def](http://flow-r.github.io/flowr/overview.html#flow_definition).
 - Works on your laptop/server or cluster (/cloud).
 - Supports **multiple cluster computing platforms** (torque, lsf, sge, slurm ...), cloud (star cluster) OR a local machine.
 - One line installation (`install.packages("flowr")`)
@@ -47,7 +61,7 @@ are to be executed in a (work)flow.
 - **Fine grain** control over resources (CPU, memory, walltime, etc.) of each step.
 
 ### Example
-[![ex_fq_bam](http://docs.flowr.space/files/ex_fq_bam.png)](https://github.com/flow-r/fastq_bam)
+[![ex_fq_bam](http://flow-r.github.io/flowr/files/ex_fq_bam.png)](https://github.com/flow-r/fastq_bam)
 
 <!---
 - Example: 
@@ -70,7 +84,7 @@ are to be executed in a (work)flow.
 
 ```r
 ## Official stable release from CRAN (updated every other month)
-## visit docs.flowr.space/install for more details
+## visit flow-r.github.io/flowr/install for more details
 install.packages("flowr",  repos = "http://cran.rstudio.com")
 
 # or a latest version from DRAT, provide cran for dependencies
@@ -79,23 +93,35 @@ install.packages("flowr", repos = c(CRAN="http://cran.rstudio.com", DRAT="http:/
 library(flowr) ## load the library
 setup() ## copy flowr bash script; and create a folder flowr under home.
 
-## Run an example pipeline
+# Run an example pipeline
+
+# style 1: sleep_pipe() function creates system cmds
 flowr run x=sleep_pipe platform=local execute=TRUE
+
+# style 2: we start with a tsv of system cmds
+# get example files
+wget --no-check-certificate http://raw.githubusercontent.com/sahilseth/flowr/master/inst/pipelines/sleep_pipe.tsv
+wget --no-check-certificate http://raw.githubusercontent.com/sahilseth/flowr/master/inst/pipelines/sleep_pipe.def
+
+# submit to local machine
+flowr to_flow x=sleep_pipe.tsv def=sleep_pipe.def platform=local execute=TRUE
+# submit to local LSF cluster
+flowr to_flow x=sleep_pipe.tsv def=sleep_pipe.def platform=lsf execute=TRUE
 ```
 
-**Example pipelines** [inst/pipelines](https://github.com/sahilseth/flowr/blob/devel/inst/pipelines)
+**Example pipelines** [inst/pipelines](https://github.com/flow-r/flowr/tree/master/inst/pipelines)
 
 ### Resources
 - For a quick overview, you may browse through,
- these [introductory slides](http://sahilseth.github.io/slides/flowrintro).
-- The [overview](http://docs.flowr.space/overview.html) provides additional details regarding
+ these [introductory slides](http://sahilseth.com/slides/flowrintro/).
+- The [overview](http://flow-r.github.io/flowr/overview.html) provides additional details regarding
 the ideas and concepts used in flowr
-- We have a [tutorial](http://docs.flowr.space/tutorial.html) which can walk you through creating a
+- We have a [tutorial](http://flow-r.github.io/flowr/tutorial.html) which can walk you through creating a
 new pipeline
-- Additionally, a subset of important functions are described in the [package reference](http://docs.flowr.space/rd.html)
+- Additionally, a subset of important functions are described in the [package reference](http://flow-r.github.io/flowr/rd.html)
 page
-- You may follow detailed instructions on [installing and configuring](http://docs.flowr.space/install.html)
-- You can use [flow creator](https://sseth.shinyapps.io/flow_creator), a shiny app to aid in
+- You may follow detailed instructions on [installing and configuring](http://flow-r.github.io/flowr/install.html)
+- You can use flow creator: https://sseth.shinyapps.io/flow_creator), a shiny app to aid in
 	designing a *shiny* new flow. This provides a good example of the concepts
 
 ### Updates
@@ -104,7 +130,7 @@ you may watch for changes using
 the [watch link above](https://help.github.com/articles/watching-repositories/).
 
 ### Feedback
-Please feel free to raise a [github issue](https://github.com/sahilseth/flowr/issues) with questions and comments.
+Please feel free to raise a [github issue](https://github.com/flow-r/flowr/issues) with questions and comments.
 
 ### Acknowledgements
 
@@ -115,7 +141,7 @@ Please feel free to raise a [github issue](https://github.com/sahilseth/flowr/is
 -   Ethan Mao
 -   Henry Song
 -   An excellent resource for writing your own R packages:
-    [r-pkgs.had.co.nz](r-pkgs.had.co.nz)
+    [r-pkgs.org](https://r-pkgs.org/)
 
 <!--why this license http://kbroman.org/pkg_primer/pages/licenses.html -->
 <script src = "vignettes/files/googl.js"></script>

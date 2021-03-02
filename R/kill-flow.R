@@ -18,7 +18,7 @@
 #' @param x either path to flow wd or object of class \link{flow}
 #' @param jobid_col Advanced use. The column name in 'flow_details.txt' file used to fetch jobids to kill
 #' @param kill_cmd The command used to kill. flowr tries to guess this commands, as defined in the detect_kill_cmd(). Supplying
-#' it here; fot custom platoforms.
+#' it here; for custom platforms.
 #' @param force You need to set force=TRUE, to kill multiple flows. This makes sure multiple flows are NOT killed by accident.
 #' @param ... not used
 #' @inheritParams to_flow
@@ -85,6 +85,9 @@ kill.flow <- function(x,
 
 	check_args()
 	
+	if(status_cat(x@status) < status_cat("submitted"))
+	  stop("This flow was has not executed, nothing to kill.")
+	
 	flow_det = to_flowdet(x)
 
 	wd = x@flow_path
@@ -94,12 +97,13 @@ kill.flow <- function(x,
 									log)
 	
 	## redirect STDERR as well if silent
+	n_cmds = length(cmds)
 	if(verbose < 2)
 		cmds = paste0(cmds, "  2>&1")
-	message("killing ", length(cmds), " jobs, please wait... See kill_jobs.out in the wd for more details.")
+	message("killing ", n_cmds, " jobs, please wait... See kill_jobs.out in the wd for more details.")
 	
-	
-	pb <- txtProgressBar(style = 3, min = 1, max = length(cmds))
+	if(length(cmds) > 1)
+	  pb <- txtProgressBar(style = 3, min = 1, max = length(cmds))
 	tmp <- lapply(1:length(cmds), function(i){
 		#for(i in 1:length(cmds)) {
 		if(verbose > 2) 
@@ -108,7 +112,8 @@ kill.flow <- function(x,
 		if(length(cmds) > 1)
 			pb$up(i)
 	})
-	close(pb)
+	if(length(cmds) > 1)
+	  close(pb)
 	
 # 	tmp <- pbsapply(cmds, function(cmd){
 # 		Sys.sleep(1)

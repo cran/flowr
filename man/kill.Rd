@@ -10,8 +10,13 @@ kill(x, ...)
 
 \method{kill}{character}(x, force = FALSE, ...)
 
-\method{kill}{flow}(x, kill_cmd, verbose = opts_flow$get("verbose"),
-  jobid_col = "job_sub_id", ...)
+\method{kill}{flow}(
+  x,
+  kill_cmd,
+  verbose = opts_flow$get("verbose"),
+  jobid_col = "job_sub_id",
+  ...
+)
 }
 \arguments{
 \item{x}{either path to flow wd or object of class \link{flow}}
@@ -21,7 +26,7 @@ kill(x, ...)
 \item{force}{You need to set force=TRUE, to kill multiple flows. This makes sure multiple flows are NOT killed by accident.}
 
 \item{kill_cmd}{The command used to kill. flowr tries to guess this commands, as defined in the detect_kill_cmd(). Supplying
-it here; fot custom platoforms.}
+it here; for custom platforms.}
 
 \item{verbose}{A numeric value indicating the amount of messages to produce.
  Values are integers varying from 0, 1, 2, 3, .... Please refer to the \link{verbose} page for more details.
@@ -56,4 +61,3 @@ kill(x='fastq_haplotyper*')
 kill(x='fastq_haplotyper*', force = TRUE)
 }
 }
-

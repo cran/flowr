@@ -4,7 +4,9 @@
 \name{verbose}
 \alias{verbose}
 \title{Verbose levels, defining verboseness of messages}
-\format{An object of class \code{NULL} of length 0.}
+\format{
+An object of class \code{NULL} of length 0.
+}
 \usage{
 verbose
 }
@@ -53,4 +55,3 @@ def = as.flowdef(fl, verbose = 2)
 # 	4: D	serial --> burst --> scatter rel: one:many
 }
 \keyword{datasets}
-

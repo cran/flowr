@@ -2,9 +2,9 @@
 % Please edit documentation in R/to-flowdet.R
 \name{to_flowdet}
 \alias{to_flowdet}
+\alias{to_flowdet.rootdir}
 \alias{to_flowdet.character}
 \alias{to_flowdet.flow}
-\alias{to_flowdet.rootdir}
 \title{Create a flow's submission detail file}
 \usage{
 to_flowdet(x, ...)
@@ -24,11 +24,10 @@ to_flowdet(x, ...)
 Create a file describing details regarding jobs ids, submission scripts etc.
 }
 \details{
-The path provided should contain a flow_detaits.rds file (which is used to extract all the information). 
+The path provided should contain a flow_details.rds file (which is used to extract all the information). 
 
 Incase a parent folder with multiple flows is provided information regarding jobids is omitted.
 
 if x is char. assumed a path, check if flow object exists in it and read it.
 If there is no flow object, try using a simpler function
 }
-

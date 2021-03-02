@@ -10,7 +10,7 @@
 #' @aliases flowr
 #'
 #' @description
-#' Use a set of shell commands (flow mat) and flow definiton to create \link{flow} object.
+#' Use a set of shell commands (flow mat) and flow definition to create \link{flow} object.
 #'
 #' @param x this can either to a filename, a data.frame or a list. 
 #' In case it is a file name, it should be a tsv file representing a flow_mat. See \link{to_flowmat} for details
@@ -22,18 +22,18 @@
 #' 
 #' @param grp_col name of the grouping column in the supplied flow_mat.
 #' See \link{to_flow} for details. Default value is [samplename].
-#' @param jobname_col name of the job name columnd in flow_mat. Defalt value is [jobname].
+#' @param jobname_col name of the job name column in flow_mat. Default value is [jobname].
 #' @param cmd_col name of the command column name in flow_mat. Default value is [cmd].
 #' 
 #' @param flowname name of the flow, this is used as part of the execution foldername.
 #' A good simple identifier, which does not support any special characters. 
-#' Names may use characters (a-z) and numbers (0-9), using underscore (_) as a word seperator.
+#' Names may use characters (a-z) and numbers (0-9), using underscore (_) as a word separator.
 #' Default value is  [flowname].
 #' 
 #' @param flow_run_path base path to be used for execution of this flow. 
 #' flowr would create a new time-stamped folder in this base path and 
 #' use it for logs, scripts etc. 
-#' The default is retrived using \code{opts_flow$get("flow_run_path")}.
+#' The default is retrieved using \code{opts_flow$get("flow_run_path")}.
 #' 
 #' @param desc Advanced Use. final flow name.
 #' 
@@ -47,15 +47,15 @@
 #' flowr creates a creates a new date-stamped folder, and includes all
 #' flows in this batch inside it. 
 #' This is keeps the logs clean, and containerizes each batch.
-#' To disable this behavious set this to FALSE, default is [TRUE].
+#' To disable this behavior set this to FALSE, default is [TRUE].
 #' 
 #' @param module_cmds A character vector of additional commands, which will be prepended to each script of the flow. 
-#' Default is retreived using \code{opts_flow$get("module_cmds")}.
+#' Default is retrieved using \code{opts_flow$get("module_cmds")}.
 #' 
 #' @param ... Supplied to specific functions like \link{to_flow.data.frame}
 #' 
 #' @param qobj Depreciated, modify cluster templates as explained on 
-#' \href{http://docs.flowr.space/install.html#hpcc_support_overview}{docs.flowr.space}.
+#' \href{http://flow-r.github.io/flowr/install.html#hpcc_support_overview}{flow-r.github.io/flowr}.
 #' An object of class \link{queue}.
 #' 
 #' @param verbose A numeric value indicating the amount of messages to produce.
@@ -65,7 +65,7 @@
 #'
 #' @examples
 #' ## Use this link for a few elaborate examples:
-#' ## http://docs.flowr.space/flowr/tutorial.html#define_modules
+#' ## http://flow-r.github.io/flowr/flowr/tutorial.html#define_modules
 #' 
 #' ex = file.path(system.file(package = "flowr"), "pipelines")
 #' flowmat = as.flowmat(file.path(ex, "sleep_pipe.tsv"))
@@ -222,7 +222,7 @@ to_flow.flowmat <- function(x, def,
     if(verbose){
       message("--> qobj supplied; this will override defaults from flow_definion OR platform variable")
       message("--> Use of qobj is for advanced use only. ",
-              "--> Use shell scripts provided here as a template: https://github.com/sahilseth/flowr/tree/master/inst/conf. ",
+              "--> Use shell scripts provided here as a template: https://github.com/flow-r/flowr/tree/master/inst/conf. ",
               "--> You may tweak and save them in ~/flowr/conf.")
     }
   }else{
@@ -254,6 +254,7 @@ to_flow.flowmat <- function(x, def,
     
     ## --- fetch samplename from the flowr_mat
     cmd.list = split.data.frame(x2, x2$jobname)
+    # get_samplename
     desc = paste(flowname, samp, sep = "-")
     fobj = to_flow(x = cmd.list,
                    def = def,
@@ -292,6 +293,11 @@ to_flow.data.frame = function(x, ...){
 }
 
 
+get_samplename <- function(fobj){
+  gsub(paste0(fobj@name, "-"), "", fobj@desc)
+}
+
+
 ## several variables come from global space !
 proc_jobs <- function(x,
                       i, 
@@ -322,6 +328,11 @@ proc_jobs <- function(x,
   d_sub_type = unlist(def2$sub_type)
   d_nodes = unlist(def2$nodes)
   d_jobid = unlist(def2$jobid)
+  
+  d_extra_opts = unlist(def2$extra_opts)
+  # If "extra_opts" is missing, set to ""
+  if( is.null(d_extra_opts) )
+    d_extra_opts = ""  
   
   if (!inherits(qobj, "queue")){
     qobj <- queue(platform = unlist(def2$platform), verbose = FALSE)
@@ -356,7 +367,8 @@ proc_jobs <- function(x,
              cpu = d_cpu, queue = d_queue,
              walltime = d_walltime,
              nodes = d_nodes,
-             memory = d_memory)
+             memory = d_memory,
+             extra_opts = d_extra_opts)
   return(jobj)
 }
 
@@ -401,7 +413,7 @@ to_flow.list <- function(x, def,
                version = as.character(packageVersion("flowr")),
                flow_run_path = flow_run_path)
   
-  ## --- check if submission or depedency types were guessed
+  ## --- check if submission or dependency types were guessed
   if (is.null(def$sub_type) | is.null(def$dep_type)){
     message("Submission/definition types were guessed.",
             "\nThis is really a experimental feature.",

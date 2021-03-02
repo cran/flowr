@@ -79,6 +79,11 @@ rerun.character <- function(x, ...){
     if(is.character(fobj))
       stop("x does not seems to be a correct path to the flow submission, missing flow_details.rds")
     
+    # assume platform of the last job is the final platform
+    f.platform = tail(fobj@jobs, 1)[[1]]@platform
+    if(f.platform == "local" & fobj@status == "created")
+      stop("Currently rerun of killed or processing local jobs is not supported.")
+    
     args = list(...)
     if(any(names(args) %in% c("flowmat", "flowdef", "flow_mat", "flow_def")))
       stop("some arguments not recognized\n",
@@ -163,6 +168,14 @@ rerun.flow <- function(x, mat, def,
       message("--> now we have: ", nrow(mat), " rows")
       if(nrow(mat) == 0)
         stop("--> no jobs left after subsetting ...")
+    }else if(missing(samplename) & unique(mat$samplename) > 1){
+      message("multiple samplenames present in flowmat, subsetting")
+      samplename = get_samplename(fobj)
+      samp = samplename  
+      mat = subset(mat, mat$samplename == samp)
+      message("--> now we have: ", nrow(mat), " rows")
+      if(nrow(mat) == 0)
+        stop("--> no jobs left after subsetting ...")
     }
   }
   
@@ -188,7 +201,9 @@ rerun.flow <- function(x, mat, def,
   # flow_run_path: does not matter, since in the next step we would use flow_path
   fobj2 <- to_flow(x = mat, def = def, 
                    flowname = fobj@name, 
-                   flow_run_path = fobj@flow_run_path, ...)
+                   flow_run_path = fobj@flow_run_path, 
+                   module_cmds = fobj@module_cmds,
+                   ...)
   
   #knitr::kable(rerun)
   fobj2@status = "rerun"

@@ -10,8 +10,19 @@ rerun(x, ...)
 
 \method{rerun}{character}(x, ...)
 
-\method{rerun}{flow}(x, mat, def, start_from, samplename, execute = TRUE,
-  kill = TRUE, select, ignore, verbose = opts_flow$get("verbose"), ...)
+\method{rerun}{flow}(
+  x,
+  mat,
+  def,
+  start_from,
+  samplename,
+  execute = TRUE,
+  kill = TRUE,
+  select,
+  ignore,
+  verbose = opts_flow$get("verbose"),
+  ...
+)
 }
 \arguments{
 \item{x}{flow working directory}
@@ -72,4 +83,3 @@ rerun(wd = wd, fobj = fobj, execute = TRUE, kill = TRUE)
 
 }
 }
-

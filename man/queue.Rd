@@ -2,18 +2,34 @@
 % Please edit documentation in R/class-def.R
 \docType{class}
 \name{queue-class}
-\alias{queue}
 \alias{queue-class}
+\alias{queue}
 \title{A \code{queue} object defines details regarding how a job is submitted}
 \usage{
-queue(object, platform = c("local", "lsf", "torque", "sge", "moab"),
-  format = "", queue = "long", walltime, memory, cpu = 1,
-  extra_opts = "", submit_exe, nodes = "1", jobname = "name",
-  email = Sys.getenv("USER"), dependency = list(), server = "localhost",
-  verbose = FALSE, cwd = "", stderr = "", stdout = "", ...)
+queue(
+  object,
+  platform = c("local", "lsf", "torque", "sge", "moab", "test", "slurm"),
+  format = "",
+  queue = "long",
+  walltime,
+  memory,
+  cpu = 1,
+  extra_opts = "",
+  submit_exe,
+  nodes = "1",
+  jobname = "name",
+  email = Sys.getenv("USER"),
+  dependency = list(),
+  server = "localhost",
+  verbose = FALSE,
+  cwd = "",
+  stderr = "",
+  stdout = "",
+  ...
+)
 }
 \arguments{
-\item{object}{this is not used currenlty, ignore.}
+\item{object}{this is not used currently, ignore.}
 
 \item{platform}{Required and important. Currently supported values are 'lsf' and 'torque'. [Used by class job]}
 
@@ -57,18 +73,17 @@ Internal function (used by \link{to_flow}), to define the format used to submit 
 }
 \details{
 \strong{Resources}:
-Can be defined **once** using a \link{queue} object and recylced to all the jobs in a flow. If resources (like memory, cpu, walltime, queue) are supplied at the
+Can be defined **once** using a \link{queue} object and recycled to all the jobs in a flow. If resources (like memory, cpu, walltime, queue) are supplied at the
 job level they overwrite the one supplied in \link{queue}
-Nodes: can be supplied ot extend a job across multiple nodes. This is purely experimental and not supported.
+Nodes: can be supplied to extend a job across multiple nodes. This is purely experimental and not supported.
 
 \strong{Server}:
 This a hook which may be implemented in future.
 
 \strong{Submission script}
-The 'platform' variable defines the format, and submit_exe; however these two are avaible for someone to create a custom submission command.
+The 'platform' variable defines the format, and submit_exe; however these two are available for someone to create a custom submission command.
 }
 \examples{
 qobj <- queue(platform='lsf')
 }
 \keyword{queue}
-

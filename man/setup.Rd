@@ -4,10 +4,13 @@
 \alias{setup}
 \title{Setup and initialize flowr}
 \usage{
-setup(bin = "~/bin", flow_base_path = opts_flow$get("flow_base_path"),
+setup(
+  bin = "~/bin",
+  flow_base_path = opts_flow$get("flow_base_path"),
   flow_run_path = opts_flow$get("flow_run_path"),
   flow_conf_path = opts_flow$get("flow_conf_path"),
-  flow_pipe_path = opts_flow$get("flow_pipe_paths"))
+  flow_pipe_path = opts_flow$get("flow_pipe_paths")
+)
 }
 \arguments{
 \item{bin}{path to bin folder}
@@ -17,7 +20,7 @@ setup(bin = "~/bin", flow_base_path = opts_flow$get("flow_base_path"),
 \item{flow_run_path}{base path to be used for execution of this flow. 
 flowr would create a new time-stamped folder in this base path and 
 use it for logs, scripts etc. 
-The default is retrived using \code{opts_flow$get("flow_run_path")}.}
+The default is retrieved using \code{opts_flow$get("flow_run_path")}.}
 
 \item{flow_conf_path}{Flowr configuration folder, used by \link{fetch_conf}.}
 
@@ -30,4 +33,3 @@ Additionally it creates a shortcut to the \code{flowr} helper script in \code{~/
 \details{
 Will add more to this, to identify cluster and aid in other things.
 }
-

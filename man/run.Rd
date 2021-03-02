@@ -6,11 +6,31 @@
 \alias{run_pipe}
 \title{Run automated Pipelines}
 \usage{
-run(x, platform, def, conf, wd = opts_flow$get("flow_run_path"),
-  flow_run_path = wd, rerun_wd, start_from, execute = FALSE, ...)
+run(
+  x,
+  platform,
+  def,
+  conf,
+  wd = opts_flow$get("flow_run_path"),
+  flow_run_path = wd,
+  rerun_wd,
+  start_from,
+  execute = FALSE,
+  ...
+)
 
-run_pipe(x, platform, def, conf, wd = opts_flow$get("flow_run_path"),
-  flow_run_path = wd, rerun_wd, start_from, execute = FALSE, ...)
+run_pipe(
+  x,
+  platform,
+  def,
+  conf,
+  wd = opts_flow$get("flow_run_path"),
+  flow_run_path = wd,
+  rerun_wd,
+  start_from,
+  execute = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{name of the pipeline to run. This is a function called to create a flow_mat.}
@@ -25,9 +45,9 @@ run_pipe(x, platform, def, conf, wd = opts_flow$get("flow_run_path"),
 
 \item{flow_run_path}{passed onto to_flow. Default it picked up from flowr.conf. Typically this is ~/flowr/runs}
 
-\item{rerun_wd}{if you need to run, supply the previous working dir}
+\item{rerun_wd}{if you need to re-run, supply the previous working dir}
 
-\item{start_from}{the step to start a rerun from. Intitutively, this is ignored in a fresh run and only used in re-running a pipeline.}
+\item{start_from}{the step to start a rerun from. Intuitively, this is ignored in a fresh run and only used in re-running a pipeline.}
 
 \item{execute}{TRUE/FALSE}
 
@@ -35,7 +55,7 @@ run_pipe(x, platform, def, conf, wd = opts_flow$get("flow_run_path"),
 }
 \description{
 Run complete pipelines, by wrapping several steps into one 
-convinient function.
+convenient function.
 
 NOTE: please use flowr version 0.9.8.9010 or higher.
 
@@ -81,4 +101,3 @@ run("sleep_pipe", platform = "lsf", execute = TRUE, x = 5)
 
 }
 }
-
